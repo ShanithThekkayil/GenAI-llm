@@ -5,14 +5,15 @@ from dotenv import load_dotenv
 load_dotenv()  
 
 # Initialize Azure OpenAI client
+# Shanith Thekkayil
 def initialize_client():
     """
     Initialize the Azure OpenAI client 
     """
     client = AzureOpenAI(
-        api_key=os.getenv("AZURE_OPENAI_API_KEY"),  # Your API key
-        api_version="2024-02-01",  # API version
-        azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT")  # Your endpoint URL
+        api_key=os.getenv("AZURE_OPENAI_API_KEY"),  # API key from .env file
+        api_version="2025-01-01-preview",  # API version
+        azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT")  # endpoint URL  from .env file
     )
     return client
 
@@ -76,7 +77,7 @@ def main():
     """
     Main function to run the LLM interaction
     """
-    print("🤖 Basic LLM Interaction Assignment")
+    print(" Basic LLM Interaction Assignment")
     print("=" * 50)
     
     # Initialize client
@@ -85,7 +86,7 @@ def main():
         print("✅ Azure OpenAI client initialized successfully!")
     except Exception as e:
         print(f"❌ Failed to initialize client: {e}")
-        print("\n📝 Setup Instructions:")
+        print("\n Setup Instructions:")
         print("1. Set environment variables:")
         print("   - AZURE_OPENAI_API_KEY=your_api_key")
         print("   - AZURE_OPENAI_ENDPOINT=your_endpoint_url")
@@ -98,19 +99,19 @@ def main():
         user_question = input("Enter your question (or 'quit' to exit): ").strip()
         
         if user_question.lower() in ['quit', 'exit', 'q']:
-            print("👋 Goodbye!")
+            print(" Done!")
             break
             
         if not user_question:
-            print("❌ Please enter a valid question.")
+            print(" Please enter a valid question.")
             continue
         
         # Basic query with default parameters
-        print(f"\n📤 Sending question: '{user_question}'")
-        print("\n🔄 Querying LLM with default parameters...")
+        print(f"\n Sending question: '{user_question}'")
+        print("\n Querying LLM with default parameters...")
         
         response = query_llm(client, user_question)
-        print(f"\n📥 LLM Response:\n{response}")
+        print(f"\n LLM Response:\n{response}")
         
         # Ask if user wants to see parameter effects
         show_params = input("\nWould you like to see how different parameters affect the response? (y/n): ").strip().lower()
