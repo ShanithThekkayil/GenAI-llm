@@ -132,7 +132,7 @@ class RAGSystem:
             text = text.replace("\n", " ").strip()
             
             response = self.client.embeddings.create(
-                model="text-embedding-ada-002",  # Update this to your embedding model deployment
+                model="text-embedding-3-small",  # Embedding model deployment
                 input=text
             )
             
@@ -151,19 +151,19 @@ class RAGSystem:
         all_metadata = []
         
         for pdf_file in pdf_files:
-            print(f"\n📖 Processing: {pdf_file}")
+            print(f"\n Processing: {pdf_file}")
             
             # Extract text
             text = self.extract_text_from_pdf(pdf_file)
             if not text:
-                print(f"❌ Failed to extract text from {pdf_file}")
+                print(f" Failed to extract text from {pdf_file}")
                 continue
                 
-            print(f"✅ Extracted {len(text)} characters")
+            print(f" Extracted {len(text)} characters")
             
             # Chunk text
             chunks = self.chunk_text(text)
-            print(f"✅ Created {len(chunks)} chunks")
+            print(f" Created {len(chunks)} chunks")
             
             # Create embeddings
             print("🔄 Creating embeddings...")
@@ -184,7 +184,7 @@ class RAGSystem:
                 if (i + 1) % 5 == 0:  # Progress indicator
                     print(f"   Processed {i + 1}/{len(chunks)} chunks...")
             
-            print(f"✅ Created {len(doc_embeddings)} embeddings")
+            print(f" Created {len(doc_embeddings)} embeddings")
             
             # Store in database
             self.vector_db.add_document(chunks, doc_embeddings, doc_metadata)
@@ -193,23 +193,23 @@ class RAGSystem:
             all_embeddings.extend(doc_embeddings)
             all_metadata.extend(doc_metadata)
         
-        print(f"\n🎉 PROCESSING COMPLETE!")
+        print(f"\n PROCESSING COMPLETE!")
         print(f"Total chunks: {len(all_chunks)}")
         print(f"Total embeddings: {len(all_embeddings)}")
         
         # Save the database
         self.vector_db.save("vector_db.pkl")
-        print("💾 Vector database saved to 'vector_db.pkl'")
+        print(" Vector database saved to 'vector_db.pkl'")
     
     def retrieve_relevant_chunks(self, question, top_k=2):
         """Retrieve most relevant chunks for a question"""
-        print(f"\n🔍 RETRIEVING RELEVANT CHUNKS")
+        print(f"\n RETRIEVING RELEVANT CHUNKS")
         print("-" * 40)
         
         # Get question embedding
         question_embedding = self.get_embedding(question)
         if not question_embedding:
-            print("❌ Failed to create question embedding")
+            print(" Failed to create question embedding")
             return []
         
         # Search in vector database
@@ -217,7 +217,7 @@ class RAGSystem:
         
         print(f"Found {len(results)} relevant chunks:")
         for i, result in enumerate(results, 1):
-            print(f"\n📄 Chunk {i} (Similarity: {result['similarity']:.3f})")
+            print(f"\n Chunk {i} (Similarity: {result['similarity']:.3f})")
             print(f"Source: {result['metadata']['source']}")
             print(f"Preview: {result['chunk'][:150]}...")
         
@@ -225,7 +225,7 @@ class RAGSystem:
     
     def generate_rag_response(self, question, retrieved_chunks):
         """Generate response using retrieved chunks as context"""
-        print(f"\n🤖 GENERATING RAG RESPONSE")
+        print(f"\n GENERATING RAG RESPONSE")
         print("-" * 40)
         
         # Build context from retrieved chunks
@@ -285,44 +285,44 @@ Answer based on the context:"""
     def query_rag_system(self, question):
         """Complete RAG pipeline: retrieve + generate"""
         print(f"\n{'='*80}")
-        print(f"❓ QUESTION: {question}")
+        print(f" QUESTION: {question}")
         print(f"{'='*80}")
         
         # Step 1: Retrieve relevant chunks
         retrieved_chunks = self.retrieve_relevant_chunks(question, top_k=2)
         
         if not retrieved_chunks:
-            print("❌ No relevant chunks found")
+            print(" No relevant chunks found")
             return
         
         # Step 2: Generate RAG response
         rag_response = self.generate_rag_response(question, retrieved_chunks)
         
         # Step 3: Generate baseline response for comparison
-        print(f"\n📊 GENERATING BASELINE RESPONSE (No RAG)")
+        print(f"\n GENERATING BASELINE RESPONSE (No RAG)")
         print("-" * 40)
         baseline_response = self.generate_baseline_response(question)
         
         # Display results
-        print(f"\n📋 RESULTS COMPARISON")
+        print(f"\n RESULTS COMPARISON")
         print("=" * 80)
         
-        print(f"\n🔍 RAG RESPONSE (With Context):")
+        print(f"\n RAG RESPONSE (With Context):")
         print("-" * 40)
         print(rag_response)
         
-        print(f"\n🤖 BASELINE RESPONSE (Without Context):")
+        print(f"\n BASELINE RESPONSE (Without Context):")
         print("-" * 40)
         print(baseline_response)
         
-        print(f"\n💡 ANALYSIS:")
+        print(f"\n ANALYSIS:")
         print("-" * 40)
         if len(rag_response) > len(baseline_response):
-            print("✅ RAG response is more detailed")
+            print(" RAG response is more detailed")
         if "cannot find" not in rag_response.lower():
-            print("✅ RAG found relevant information")
+            print(" RAG found relevant information")
         if any(chunk['similarity'] > 0.7 for chunk in retrieved_chunks):
-            print("✅ High similarity chunks retrieved")
+            print(" High similarity chunks retrieved")
         
         return {
             'question': question,
@@ -335,8 +335,8 @@ Answer based on the context:"""
 
 def main():
     """Main function for RAG system"""
-    print("🔄 Assignment 3: Retrieval Augmented Generation (RAG)")
-    print("🎯 Goal: Improve LLM answers using document retrieval")
+    print(" Assignment 3: Retrieval Augmented Generation (RAG)")
+    print(" Goal: Improve LLM answers using document retrieval")
     print("=" * 80)
     
     # Initialize RAG system
@@ -344,12 +344,12 @@ def main():
     
     # Check if vector database already exists
     if rag_system.vector_db.load("vector_db.pkl"):
-        print("✅ Loaded existing vector database!")
-        print("📊 Database stats:")
+        print(" Loaded existing vector database!")
+        print(" Database stats:")
         print(f"   Chunks: {len(rag_system.vector_db.chunks)}")
         print(f"   Embeddings: {len(rag_system.vector_db.embeddings)}")
     else:
-        print("📂 No existing database found. Let's process your PDF documents...")
+        print(" No existing database found. Let's process your PDF documents...")
         
         print("\nEnter your PDF file paths (one per line, empty line to finish):")
         pdf_files = []
@@ -359,20 +359,20 @@ def main():
                 break
             if os.path.exists(path) and path.endswith('.pdf'):
                 pdf_files.append(path)
-                print(f"✅ Added {path}")
+                print(f" Added {path}")
             else:
-                print(f"❌ File not found or not a PDF: {path}")
+                print(f" File not found or not a PDF: {path}")
         
         if pdf_files:
             rag_system.process_documents(pdf_files)
         else:
-            print("❌ No valid PDF files provided")
+            print(" No valid PDF files provided")
             return
     
     # Interactive query loop
     print(f"\n{'='*80}")
-    print("🔍 RAG SYSTEM READY! Ask questions about your documents.")
-    print("💡 Sample questions to try:")
+    print(" RAG SYSTEM READY! Ask questions about your documents.")
+    print(" Sample questions to try:")
     print("   • How many paid leaves do we get per year?")
     print("   • What are the system requirements?")
     print("   • What is the work from home policy?")
@@ -384,19 +384,18 @@ def main():
         question = input("Enter your question (or 'quit' to exit): ").strip()
         
         if question.lower() in ['quit', 'exit', 'q']:
-            print("👋 Goodbye!")
+            print(" RAG System with PDF Completed.!")
             break
             
         if not question:
-            print("❌ Please enter a valid question.")
+            print(" Please enter a valid question.")
             continue
         
         # Query the RAG system
         rag_system.query_rag_system(question)
 
-if __name__ == "__main__":
-    # Install required packages reminder
-    print("📦 Required packages: PyPDF2, scikit-learn, numpy")
+if __name__ == "__main__": 
+    print("Install required packages reminder - Required packages: PyPDF2, scikit-learn, numpy")
     print("Install with: pip install PyPDF2 scikit-learn numpy")
     print("-" * 60)
     
